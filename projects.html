@@ -1,353 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects — Geigi.net</title>
-  <link rel="icon" href="icon3 (1).png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — Geigi.net</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.4.2/sha.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#000;color:#ccc;font-family:'Courier New',monospace;}
+#wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 4rem;}
 
-    :root {
-      --bg: #05080f;
-      --surface: #0d1526;
-      --surface2: #111d35;
-      --border: rgba(37, 99, 235, 0.25);
-      --border-hover: rgba(37, 99, 235, 0.6);
-      --blue: #2563eb;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(37, 99, 235, 0.15);
-      --text: #e8f0ff;
-      --text-muted: #7a90b8;
-      --accent: #f59e0b;
-    }
 
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+.nav{width:100%;border-bottom:1px solid #1e1e1e;padding:14px 28px;display:flex;align-items:center;gap:10px;background:#000;}
+.nav a{color:#555;text-decoration:none;font-size:13px;}
+.nav a:hover{color:#aaa;}
+.nav-sep{color:#333;font-size:13px;}
+.nav-cur{color:#777;font-size:13px;}
 
-    .bg-grid {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-    .bg-orb {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-      filter: blur(80px);
-    }
-    .orb1 { width: 500px; height: 500px; top: -150px; left: -100px; background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%); animation: drift 14s ease-in-out infinite; }
-    .orb2 { width: 400px; height: 400px; bottom: -100px; right: -80px; background: radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%); animation: drift 18s ease-in-out infinite reverse; }
-    @keyframes drift {
-      0%,100% { transform: translate(0,0); }
-      33% { transform: translate(40px,30px); }
-      66% { transform: translate(-20px,50px); }
-    }
 
-   
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 0 2rem; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(5,8,15,0.75);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800; font-size: 1.25rem;
-      color: var(--blue-light); text-decoration: none;
-      letter-spacing: -0.02em;
-    }
-    .nav-logo span { color: var(--text-muted); font-weight: 400; }
+#ascii-out{font-size:9px;line-height:1.15;letter-spacing:1.3px;color:#fff;white-space:pre;display:block;width:100%;text-align:center;padding:2.5rem 0 2rem;background:#000;}
 
-    .burger {
-      background: none; border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px 10px;
-      cursor: pointer; display: flex; flex-direction: column; gap: 5px;
-      transition: border-color 0.2s;
-    }
-    .burger:hover { border-color: var(--blue); }
-    .burger-line { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
-    .burger.open .burger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .burger.open .burger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .burger.open .burger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    .dropdown {
-      position: absolute; top: calc(100% + 8px); right: 2rem;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 0.75rem;
-      min-width: 200px; display: flex; flex-direction: column; gap: 2px;
-      opacity: 0; transform: translateY(-8px) scale(0.97);
-      pointer-events: none;
-      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(37,99,235,0.1);
-    }
-    .dropdown.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-    .dropdown a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 8px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.9rem; font-weight: 500; transition: all 0.15s;
-    }
-    .dropdown a:hover { background: var(--surface2); color: var(--text); }
-    .dropdown a.active { color: var(--blue-light); }
-    .dropdown-icon { font-size: 1rem; width: 20px; text-align: center; }
-    .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
-    .dropdown-socials { display: flex; gap: 8px; padding: 8px 12px 4px; }
-    .social-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 10px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.8rem; font-weight: 500;
-      transition: all 0.15s; flex: 1; justify-content: center;
-    }
-    .social-pill:hover { border-color: var(--blue); color: var(--text); }
-    .social-pill img { width: 16px; height: 16px; object-fit: contain; }
+.content{width:820px;max-width:95%;display:flex;flex-direction:column;gap:16px;}
 
-   
-    main {
-      position: relative; z-index: 1;
-      max-width: 1100px; margin: 0 auto;
-      padding: 88px 1.5rem 4rem;
-    }
 
-    
-    .outdated-banner {
-      display: flex; align-items: center; gap: 12px;
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 2rem;
-      animation: fadeUp 0.4s ease both;
-    }
-    .outdated-banner-icon { font-size: 1.1rem; flex-shrink: 0; }
-    .outdated-banner-text { font-size: 0.85rem; color: #fcd34d; line-height: 1.4; }
-    .outdated-banner-text b { font-weight: 600; }
+.warn{background:#111;border:1px solid #2a1a00;border-radius:6px;padding:14px 22px;font-size:13px;color:#7a5c1e;display:flex;gap:10px;align-items:flex-start;}
+.warn-icon{color:#5a3c00;flex-shrink:0;}
 
-   
-    .page-header {
-      margin-bottom: 2rem;
-      animation: fadeUp 0.5s 0.05s ease both;
-    }
-    .page-label {
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.7rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--blue-light); margin-bottom: 6px;
-    }
-    .page-title {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800; font-size: 2rem;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #fff 0%, var(--blue-light) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .page-sub { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; }
 
-    
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
+.card{background:#111;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden;}
+.card-path{font-size:12px;color:#444;padding:10px 22px;border-bottom:1px solid #1e1e1e;}
 
-   
-    .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      overflow: hidden;
-      text-decoration: none; color: inherit;
-      transition: all 0.22s;
-      opacity: 0;
-      animation: fadeUp 0.5s ease forwards;
-      display: flex; flex-direction: column;
-    }
-    .project-card:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(37,99,235,0.12);
-    }
-    .project-img-wrap {
-      position: relative; height: 160px; overflow: hidden;
-      background: var(--surface2);
-    }
-    .project-img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.35s; display: block;
-    }
-    .project-card:hover .project-img { transform: scale(1.06); }
-    .project-overlay {
-      position: absolute; inset: 0;
-      background: rgba(5,8,15,0.6);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.2s;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700; font-size: 0.9rem;
-      color: var(--blue-light); letter-spacing: 0.05em;
-      gap: 6px;
-    }
-    .project-card:hover .project-overlay { opacity: 1; }
 
-    .project-body {
-      padding: 1rem 1.1rem 1.1rem;
-      display: flex; flex-direction: column; gap: 6px; flex: 1;
-    }
-    .project-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .project-title {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700; font-size: 1rem;
-      color: var(--text);
-    }
-    .badge {
-      font-size: 0.65rem; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 2px 7px; border-radius: 99px; flex-shrink: 0;
-    }
-    .badge-beta { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-    .project-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+.proj-row{display:flex;align-items:baseline;gap:0;border-bottom:1px solid #1a1a1a;text-decoration:none;}
+.proj-row:last-child{border-bottom:none;}
+.proj-row:hover .proj-name{color:#fff;}
+.proj-row:hover .proj-action{color:#666;}
+.proj-row:hover{background:#141414;}
+.proj-inner{display:flex;justify-content:space-between;align-items:center;width:100%;padding:15px 22px;}
+.proj-left{display:flex;align-items:baseline;gap:14px;flex:1;min-width:0;}
+.proj-idx{font-size:11px;color:#333;min-width:24px;flex-shrink:0;}
+.proj-name{font-size:14px;color:#ddd;font-weight:bold;white-space:nowrap;}
+.proj-sep{font-size:12px;color:#2a2a2a;margin:0 10px;}
+.proj-desc{font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.proj-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.proj-badge{font-size:10px;color:#5a3c00;border:1px solid #3a2500;padding:1px 6px;border-radius:3px;}
+.proj-action{font-size:12px;color:#333;transition:color 0.12s;}
 
-    /* ── Footer note ── */
-    .footer-note {
-      margin-top: 2.5rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem 1.5rem;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      animation: fadeUp 0.5s ease both;
-    }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+.footer-card{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:16px 22px;}
+.footer-card p{font-size:12px;color:#444;line-height:1.6;}
+</style>
 </head>
 <body>
+<div id="wrap">
+  <nav class="nav">
+    <a href="/">geigi.net</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-cur">projects</span>
+  </nav>
 
-<div class="bg-grid"></div>
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
+  <pre id="ascii-out"></pre>
 
-<nav>
-  <a href="/" class="nav-logo">Geigi<span>.net</span></a>
-  <div style="position:relative;">
-    <button class="burger" id="burgerBtn" onclick="toggleMenu()" aria-label="Menu">
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-    </button>
-    <div class="dropdown" id="dropdown">
-      <a href="/"><span class="dropdown-icon">🏠</span> Home</a>
-      <a href="projects" class="active"><span class="dropdown-icon">🛠️</span> Projects</a>
-      <a href="verify"><span class="dropdown-icon">✅</span> Verify Me</a>
-      <a href="2fa"><span class="dropdown-icon">🔐</span> 2FA Generator</a>
-      <a href="https://dcserver.dev/" target="_blank"><span class="dropdown-icon">💬</span> Discord Setups</a>
-      <div class="dropdown-divider"></div>
-      <div class="dropdown-socials">
-        <a class="social-pill" href="https://discord.com/users/463953200559685632" target="_blank">
-          <img src="discord.png" alt="Discord"> @geigi
-        </a>
-        <a class="social-pill" href="https://oguser.com/geigi" target="_blank">
-          <img src="Oguserslogo.png" alt="OGU"> /geigi
-        </a>
-      </div>
+  <div class="content">
+    <div class="warn">
+      <span class="warn-icon">[!]</span>
+      <span>NOTICE &mdash; This page hasn't been updated in a while. Uploading new projects soon.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-path">/home/geigi/projects &mdash; 11 entries</div>
+      <div id="proj-list"></div>
+    </div>
+
+    <div class="footer-card">
+      <p>> Many more projects to come.<br>> If a project is missing, it's most likely private.</p>
     </div>
   </div>
-</nav>
-
-<main>
-
-  <div class="outdated-banner">
-    <span class="outdated-banner-icon">⚠️</span>
-    <span class="outdated-banner-text"><b>NOTICE:</b> This page hasn't been updated in a while! Uploading new projects soon! </span>
-  </div>
-
-  
-  <div class="page-header">
-    <div class="page-label">🛠️ Portfolio</div>
-    <div class="page-title">Projects</div>
-    <div class="page-sub">Tools, sites & things I've built. Hover to open.</div>
-  </div>
-
-  
-  <div class="projects-grid" id="projectsGrid"></div>
-
-  
-  <div class="footer-note">
-    Many more projects to come (Also if you don't see a project that i worked on here, it's most likely private...)
-  </div>
-</main>
+</div>
 
 <script>
- 
-  function toggleMenu() {
-    document.getElementById('burgerBtn').classList.toggle('open');
-    document.getElementById('dropdown').classList.toggle('show');
-  }
-  document.addEventListener('click', e => {
-    const btn = document.getElementById('burgerBtn');
-    const dd  = document.getElementById('dropdown');
-    if (!btn.contains(e.target) && !dd.contains(e.target)) {
-      btn.classList.remove('open');
-      dd.classList.remove('show');
+const projects = [
+  { title:"QR Project",                desc:"Free client-side QR code generator.",                              url:"https://geigi.net/qr" },
+  { title:"Password Tool",             desc:"Secure passwords with custom options, client-side.",               url:"https://geigi.net/password" },
+  { title:"Profile Picture Generator", desc:"Crop any picture into a perfect circle.",                          url:"https://geigi.net/pfp",          beta:true },
+  { title:"Word Mixer",                desc:"Find the correct word from mixed letters.",                        url:"https://geigi.net/word-mixer",   beta:true },
+  { title:"OGArchive",                 desc:"Community archive of OG Minecraft screenshots.",                   url:"https://OGARCHIVE.com" },
+  { title:"List Generator",            desc:"Generate every 3-letter combo, 0000-9999, and more.",              url:"https://geigi.net/lists",        beta:true },
+  { title:"DCServer.dev",              desc:"High quality Discord server setups.",                              url:"https://dcserver.dev" },
+  { title:"To-Do List",               desc:"Build a to-do list and download it as a PNG.",                     url:"https://geigi.net/to-do",        beta:true },
+  { title:"2FA Code Generator",        desc:"Generate 2FA codes entirely in your browser.",                     url:"https://geigi.net/2fa" },
+  { title:"Discord 4 Letters",         desc:"Collection of rare 4-letter Discord usernames.",                   url:"https://geigi.net/4l" },
+  { title:"Crypto-Amount",             desc:"USD to crypto converter at live prices.",                          url:"https://geigi.net/crypto-amount",beta:true },
+];
+
+const list = document.getElementById('proj-list');
+projects.forEach((p, i) => {
+  const a = document.createElement('a');
+  a.href = p.url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.className = 'proj-row';
+  a.innerHTML = `<div class="proj-inner">
+    <div class="proj-left">
+      <span class="proj-idx">${String(i+1).padStart(2,'0')}</span>
+      <span class="proj-name">${p.title}</span>
+      <span class="proj-sep">//</span>
+      <span class="proj-desc">${p.desc}</span>
+    </div>
+    <div class="proj-right">
+      ${p.beta ? '<span class="proj-badge">BETA</span>' : ''}
+      <span class="proj-action">open ↗</span>
+    </div>
+  </div>`;
+  list.appendChild(a);
+});
+
+// ASCII art
+const CHARS=' ..,,::--==++xxXX8800SS##@@';
+function render(){
+  const COLS=110,ROWS=22,CW=1600,CH=260;
+  const cv=document.createElement('canvas');
+  cv.width=CW;cv.height=CH;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#000';ctx.fillRect(0,0,CW,CH);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 210px Arial Black,Impact,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('Projects',CW/2,CH/2);
+  const cellW=CW/COLS,cellH=CH/ROWS;
+  let out='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const x=Math.floor(c*cellW),y=Math.floor(r*cellH);
+      const pw=Math.max(1,Math.floor(cellW)),ph=Math.max(1,Math.floor(cellH));
+      const px=ctx.getImageData(x,y,pw,ph).data;
+      let sum=0;for(let i=0;i<px.length;i+=4)sum+=px[i];
+      const avg=sum/(px.length/4);
+      out+=CHARS[Math.floor((avg/255)*(CHARS.length-1))];
     }
-  });
-
-  
-  const projects = [
-    { title: "QR Project",                desc: "A free QR tool to make client-side QR codes.",                                          url: "https://geigi.net/qr",           img: "qrpro.jpg" },
-    { title: "Password Tool",             desc: "Generate client-side secure passwords with custom options.",                            url: "https://geigi.net/password",     img: "pwpro.jpg" },
-    { title: "Profile Picture Generator", desc: "Crop any picture into a perfect circle. Ideal for websites and other projects.",        url: "https://geigi.net/pfp",          img: "pfppro.jpg",  beta: true },
-    { title: "Word Mixer",                desc: "A fun game where mixed letters are given and you find the correct word.",               url: "https://geigi.net/word-mixer",   img: "wordpro.jpg", beta: true },
-    { title: "OGArchive",                 desc: "A community-driven archive of old meaningful OG Minecraft screenshots.",               url: "https://OGARCHIVE.com",          img: "ogpro.jpg" },
-    { title: "List Generator",            desc: "Generate lists like every 3-letter combo or all numbers from 0000 to 9999.",           url: "https://geigi.net/lists",        img: "listpro.jpg", beta: true },
-    { title: "DCServer.dev",              desc: "High quality Discord server setups for your community.",                               url: "https://dcserver.dev",           img: "dcpro.jpg" },
-    { title: "To-Do List",               desc: "Build your personal to-do list and download it as a PNG. Stay organized!",             url: "https://geigi.net/to-do",        img: "todopro.jpg", beta: true },
-    { title: "2FA Code Generator",        desc: "Generate secure 2FA codes for your accounts. Runs entirely in your browser.",          url: "https://geigi.net/2fa",          img: "2fapro.jpg" },
-    { title: "Discord 4 Letters",         desc: "My collection of rare 4-letter Discord usernames.",                                    url: "https://geigi.net/4l",           img: "dc4lpro.jpg" },
-    { title: "Crypto-Amount",             desc: "Enter a USD amount and see how much it is in various cryptos at live prices.",         url: "https://geigi.net/crypto-amount",img: "cryptoval.jpg", beta: true },
-  ];
-
-  const grid = document.getElementById('projectsGrid');
-
-  projects.forEach((p, i) => {
-    const card = document.createElement('a');
-    card.href = p.url;
-    card.target = '_blank';
-    card.rel = 'noopener noreferrer';
-    card.className = 'project-card';
-    card.style.animationDelay = `${0.08 + i * 0.05}s`;
-    card.innerHTML = `
-      <div class="project-img-wrap">
-        <img src="${p.img}" alt="${p.title}" class="project-img">
-        <div class="project-overlay">↗ Open Project</div>
-      </div>
-      <div class="project-body">
-        <div class="project-top">
-          <div class="project-title">${p.title}</div>
-          ${p.beta ? '<span class="badge badge-beta">Beta</span>' : ''}
-        </div>
-        <div class="project-desc">${p.desc}</div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
+    out+='\n';
+  }
+  document.getElementById('ascii-out').textContent=out;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);
+else render();
 </script>
 </body>
 </html>
