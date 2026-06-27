@@ -1,399 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:title" content="Geigi's Website | geigi.net" />
-  <meta property="og:description" content="Explore my projects, verify me, use 2FA, and learn more about me – all in one place at geigi.net!" />
-  <meta property="og:url" content="https://geigi.net" />
-  <meta property="og:image" content="https://geigi.net/Image%20(54).jpg" />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#2563eb" />
-  <title>Geigi.net</title>
-  <link rel="icon" href="icon3 (1).png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #05080f;
-      --surface: #0d1526;
-      --surface2: #111d35;
-      --border: rgba(37, 99, 235, 0.25);
-      --border-hover: rgba(37, 99, 235, 0.6);
-      --blue: #2563eb;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(37, 99, 235, 0.15);
-      --text: #e8f0ff;
-      --text-muted: #7a90b8;
-      --accent: #f59e0b;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#000;}
+#wrap{background:#000;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 4rem;}
+#ascii-out{font-family:'Courier New',monospace;font-size:11px;line-height:1.2;letter-spacing:1.6px;color:#fff;white-space:pre;display:block;width:100%;text-align:center;padding:3rem 0 2.5rem;background:#000;}
+.card{background:#111;border:1px solid #2a2a2a;border-radius:8px;width:820px;max-width:95%;font-family:'Courier New',monospace;overflow:hidden;}
+.card-path{font-size:14px;color:#555;padding:14px 28px;border-bottom:1px solid #1e1e1e;}
+.card-body{padding:34px 34px 12px;}
+.card-body p{font-size:17px;color:#bbb;line-height:1.8;margin-bottom:18px;}
+.card-body .sub{font-size:14.5px;color:#555;margin-bottom:0;}
+.card-links{border-top:1px solid #1e1e1e;margin-top:10px;}
+.link-row{display:flex;justify-content:space-between;align-items:center;padding:20px 34px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background 0.12s;text-decoration:none;}
+.link-row:last-child{border-bottom:none;}
+.link-row:hover{background:#191919;}
+.link-label{font-size:16px;color:#ddd;font-family:'Courier New',monospace;font-weight:bold;}
+.link-action{font-size:14px;color:#444;font-family:'Courier New',monospace;transition:color 0.12s;}
+.link-row:hover .link-action{color:#888;}
+</style>
 
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    
-    .bg-grid {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-    .bg-orb {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-      filter: blur(80px);
-    }
-    .orb1 { width: 500px; height: 500px; top: -150px; left: -100px; background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%); animation: drift 14s ease-in-out infinite; }
-    .orb2 { width: 400px; height: 400px; bottom: -100px; right: -80px; background: radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%); animation: drift 18s ease-in-out infinite reverse; }
-    @keyframes drift {
-      0%,100% { transform: translate(0,0); }
-      33% { transform: translate(40px, 30px); }
-      66% { transform: translate(-20px, 50px); }
-    }
-
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 0 2rem;
-      height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(5, 8, 15, 0.75);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 1.25rem;
-      color: var(--blue-light);
-      text-decoration: none;
-      letter-spacing: -0.02em;
-    }
-    .nav-logo span { color: var(--text-muted); font-weight: 400; }
-
-  
-    .burger {
-      background: none; border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px 10px;
-      cursor: pointer; display: flex; flex-direction: column; gap: 5px;
-      transition: border-color 0.2s;
-    }
-    .burger:hover { border-color: var(--blue); }
-    .burger-line {
-      width: 20px; height: 2px; background: var(--text);
-      border-radius: 2px; transition: all 0.3s;
-    }
-    .burger.open .burger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .burger.open .burger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .burger.open .burger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-   
-    .dropdown {
-      position: absolute; top: calc(100% + 8px); right: 2rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0.75rem;
-      min-width: 200px;
-      display: flex; flex-direction: column; gap: 2px;
-      opacity: 0; transform: translateY(-8px) scale(0.97);
-      pointer-events: none;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(37,99,235,0.1);
-    }
-    .dropdown.show {
-      opacity: 1; transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
-    .dropdown a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 8px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.9rem; font-weight: 500;
-      transition: all 0.15s;
-    }
-    .dropdown a:hover { background: var(--surface2); color: var(--text); }
-    .dropdown a.active { color: var(--blue-light); }
-    .dropdown-icon { font-size: 1rem; width: 20px; text-align: center; }
-    .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
-    .dropdown-socials { display: flex; gap: 8px; padding: 8px 12px 4px; }
-    .social-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 10px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.8rem; font-weight: 500;
-      transition: all 0.15s; flex: 1; justify-content: center;
-    }
-    .social-pill:hover { border-color: var(--blue); color: var(--text); }
-    .social-pill img { width: 16px; height: 16px; object-fit: contain; }
-
-  
-    main {
-      position: relative; z-index: 1;
-      max-width: 640px; margin: 0 auto;
-      padding: 100px 1.5rem 4rem;
-      display: flex; flex-direction: column; gap: 20px;
-    }
-
-    
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      display: flex; flex-direction: column; align-items: center;
-      text-align: center; gap: 1rem;
-      animation: fadeUp 0.6s ease both;
-      position: relative; overflow: hidden;
-    }
-    .hero-card::before {
-      content: ''; position: absolute;
-      top: 0; left: 50%; transform: translateX(-50%);
-      width: 200px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--blue), transparent);
-    }
-    .avatar-wrap {
-      position: relative; display: inline-block;
-    }
-    .avatar-wrap img {
-      width: 88px; height: 88px; border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--border-hover);
-      display: block;
-    }
-    .avatar-ring {
-      position: absolute; inset: -4px; border-radius: 50%;
-      background: conic-gradient(var(--blue), var(--blue-light), var(--blue));
-      z-index: -1; animation: spin 6s linear infinite;
-      opacity: 0.6;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .hero-name {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800; font-size: 2.2rem;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #fff 0%, var(--blue-light) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .splash-text {
-      color: var(--accent);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem; font-weight: 500;
-      min-height: 1.4em;
-      letter-spacing: 0.01em;
-    }
-    .hero-desc {
-      color: var(--text-muted);
-      font-size: 0.9rem; line-height: 1.6;
-      max-width: 380px;
-    }
-
-    
-    .features {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      animation: fadeUp 0.6s 0.1s ease both;
-    }
-    .feat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem 1.25rem 1rem;
-      text-decoration: none; color: inherit;
-      transition: all 0.2s;
-      display: flex; flex-direction: column; gap: 8px;
-      position: relative; overflow: hidden;
-    }
-    .feat-card::after {
-      content: ''; position: absolute; inset: 0;
-      background: var(--blue-glow);
-      opacity: 0; transition: opacity 0.2s;
-      border-radius: inherit;
-    }
-    .feat-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
-    .feat-card:hover::after { opacity: 1; }
-    .feat-icon { font-size: 1.4rem; }
-    .feat-title {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700; font-size: 0.95rem;
-      color: var(--text);
-    }
-    .feat-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
-    .feat-arrow {
-      margin-top: auto; font-size: 0.75rem; color: var(--blue-light);
-      opacity: 0; transform: translateX(-4px);
-      transition: all 0.2s;
-    }
-    .feat-card:hover .feat-arrow { opacity: 1; transform: translateX(0); }
-
-    
-    .about-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 1.75rem;
-      animation: fadeUp 0.6s 0.2s ease both;
-    }
-    .about-label {
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.7rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--blue-light); margin-bottom: 0.75rem;
-    }
-    .about-text { color: var(--text-muted); font-size: 0.88rem; line-height: 1.7; }
-    .about-text b { color: var(--text); font-weight: 500; }
-
-   
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-
-<div class="bg-grid"></div>
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
-
-<nav>
-  <a href="/" class="nav-logo">Geigi<span>.net</span></a>
-  <div style="position:relative;">
-    <button class="burger" id="burgerBtn" onclick="toggleMenu()" aria-label="Menu">
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-    </button>
-    <div class="dropdown" id="dropdown">
-      <a href="/" class="active"><span class="dropdown-icon">🏠</span> Home</a>
-      <a href="projects"><span class="dropdown-icon">🛠️</span> Projects</a>
-      <a href="verify"><span class="dropdown-icon">✅</span> Verify Me</a>
-      <a href="2fa"><span class="dropdown-icon">🔐</span> 2FA Generator</a>
-      <a href="https://dcserver.dev/" target="_blank"><span class="dropdown-icon">💬</span> Discord Setups</a>
-      <div class="dropdown-divider"></div>
-      <div class="dropdown-socials">
-        <a class="social-pill" href="https://discord.com/users/463953200559685632" target="_blank">
-          <img src="discord.png" alt="Discord"> @geigi
-        </a>
-        <a class="social-pill" href="https://oguser.com/geigi" target="_blank">
-          <img src="Oguserslogo.png" alt="OGU"> /geigi
-        </a>
-      </div>
+<div id="wrap">
+  <pre id="ascii-out"></pre>
+  <div class="card">
+    <div class="card-path">/home/geigi/about-me.txt</div>
+    <div class="card-body">
+      <p>Hey, I'm Geigi — I've been part of the OG Minecraft Username Community since 2021 and am also active in the 2B2T Community, building tools, making friends, and working on coding projects I care about. This site is my personal hub: explore my projects, use my 2FA generator, and more.</p>
+      <p class="sub">Contact through Discord only.</p>
+    </div>
+    <div class="card-links">
+      <a class="link-row" href="https://geigi.net/projects" target="_blank" rel="noopener"><span class="link-label">Projects</span><span class="link-action">open ↗</span></a>
+      
+      <a class="link-row" href="https://geigi.net/2fa" target="_blank" rel="noopener"><span class="link-label">2FA Generator</span><span class="link-action">open ↗</span></a>
+      <a class="link-row" href="https://geigi.net/discord" target="_blank" rel="noopener"><span class="link-label">Discord Setups</span><span class="link-action">open ↗</span></a>
     </div>
   </div>
-</nav>
-
-<main>
- 
-  <div class="hero-card">
-    <div class="avatar-wrap">
-      <div class="avatar-ring"></div>
-      <img src="Image (54).jpg" alt="Geigi">
-    </div>
-    <h1 class="hero-name">Geigi.net</h1>
-    <div class="splash-text" id="splashText"></div>
-    <p class="hero-desc">
-      Your hub for all things Geigi — projects, verification, 2FA tools, and more. Check the menu to explore everything.
-    </p>
-  </div>
-
-
-  <div class="features">
-    <a class="feat-card" href="projects">
-      <div class="feat-icon">🛠️</div>
-      <div class="feat-title">Projects</div>
-      <div class="feat-desc">Bots, tools & things I've built.</div>
-      <div class="feat-arrow">→ Explore</div>
-    </a>
-    <a class="feat-card" href="verify">
-      <div class="feat-icon">✅</div>
-      <div class="feat-title">Verify Me</div>
-      <div class="feat-desc">Confirm my real Discord account.</div>
-      <div class="feat-arrow">→ Verify</div>
-    </a>
-    <a class="feat-card" href="2fa">
-      <div class="feat-icon">🔐</div>
-      <div class="feat-title">2FA Generator</div>
-      <div class="feat-desc">Generate TOTP codes instantly.</div>
-      <div class="feat-arrow">→ Open</div>
-    </a>
-    <a class="feat-card" href="https://dcserver.dev/" target="_blank">
-      <div class="feat-icon">💬</div>
-      <div class="feat-title">Discord Setups</div>
-      <div class="feat-desc">Custom server setups & configs.</div>
-      <div class="feat-arrow">→ Visit</div>
-    </a>
-  </div>
-
-  
-  <div class="about-card">
-    <div class="about-label">About</div>
-    <p class="about-text">
-      Hey, I'm Geigi — I've been part of the <b>OG Community since 2021</b> and am also active in the <b>2b2t Community</b>, building tools, making connections, and working on projects I care about. This site is my personal hub: verify I'm the real deal, use my 2FA generator, check out what I'm working on, and more.<br><br>
-      Got questions? Hit me up on Discord.
-    </p>
-  </div>
-</main>
+</div>
 
 <script>
- 
-  function toggleMenu() {
-    const btn = document.getElementById('burgerBtn');
-    const dd  = document.getElementById('dropdown');
-    btn.classList.toggle('open');
-    dd.classList.toggle('show');
-  }
-  document.addEventListener('click', e => {
-    const btn = document.getElementById('burgerBtn');
-    const dd  = document.getElementById('dropdown');
-    if (!btn.contains(e.target) && !dd.contains(e.target)) {
-      btn.classList.remove('open');
-      dd.classList.remove('show');
+const CHARS=' ..,,::--==++xxXX8800SS##@@';
+function render(){
+  const COLS=120,ROWS=28,CW=1800,CH=340;
+  const cv=document.createElement('canvas');
+  cv.width=CW;cv.height=CH;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#000';ctx.fillRect(0,0,CW,CH);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 260px Arial Black,Impact,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('Geigi.net',CW/2,CH/2);
+  const cellW=CW/COLS,cellH=CH/ROWS;
+  let out='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const x=Math.floor(c*cellW),y=Math.floor(r*cellH);
+      const pw=Math.max(1,Math.floor(cellW)),ph=Math.max(1,Math.floor(cellH));
+      const px=ctx.getImageData(x,y,pw,ph).data;
+      let sum=0;
+      for(let i=0;i<px.length;i+=4)sum+=px[i];
+      const avg=sum/(px.length/4);
+      const idx=Math.floor((avg/255)*(CHARS.length-1));
+      out+=CHARS[idx];
     }
-  });
-
-  
-  const splashTexts = [
-    "in the OG & 2b2t Community 🏆",
-    "hedgehog enthusiast 🦔",
-    "need help? contact me anytime.",
-    "stay safe – always verify!",
-    "discord setups? i got you 💬",
-    "2FA codes, one click away 🔐",
-    "building things since 2021 🛠️",
-    "welcome to geigi.net ✦"
-  ];
-
-  let idx = 0;
-  const el = document.getElementById('splashText');
-
-  function updateSplash() {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(4px)';
-    setTimeout(() => {
-      idx = (idx + 1) % splashTexts.length;
-      el.textContent = splashTexts[idx];
-      el.style.transition = 'all 0.4s ease';
-      el.style.opacity = '1';
-      el.style.transform = 'translateY(0)';
-    }, 300);
+    out+='\n';
   }
-
-  el.style.transition = 'all 0.4s ease';
-  el.textContent = splashTexts[0];
-  el.style.opacity = '1';
-  setInterval(updateSplash, 3000);
+  document.getElementById('ascii-out').textContent=out;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);
+else render();
 </script>
-</body>
-</html>
