@@ -1,466 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2FA Generator — Geigi.net</title>
-  <link rel="icon" href="icon3 (1).png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.4.2/sha.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2FA Generator — Geigi.net</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.4.2/sha.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#000;color:#ccc;font-family:'Courier New',monospace;}
+#wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 4rem;}
 
-    :root {
-      --bg: #05080f;
-      --surface: #0d1526;
-      --surface2: #111d35;
-      --border: rgba(37, 99, 235, 0.25);
-      --border-hover: rgba(37, 99, 235, 0.6);
-      --blue: #2563eb;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(37, 99, 235, 0.15);
-      --text: #e8f0ff;
-      --text-muted: #7a90b8;
-      --accent: #f59e0b;
-      --green: #22c55e;
-      --red: #ef4444;
-    }
+.nav{width:100%;border-bottom:1px solid #1e1e1e;padding:14px 28px;display:flex;align-items:center;gap:10px;background:#000;}
+.nav a{color:#555;text-decoration:none;font-size:13px;}
+.nav a:hover{color:#aaa;}
+.nav-sep{color:#333;font-size:13px;}
+.nav-cur{color:#777;font-size:13px;}
 
-    html { scroll-behavior: smooth; }
+#ascii-out{font-size:9px;line-height:1.15;letter-spacing:1.3px;color:#fff;white-space:pre;display:block;width:100%;text-align:center;padding:2.5rem 0 2rem;background:#000;}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+.content{width:820px;max-width:95%;display:flex;flex-direction:column;gap:16px;}
 
-    .bg-grid {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-    .bg-orb {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-      filter: blur(80px);
-    }
-    .orb1 { width: 500px; height: 500px; top: -150px; left: -100px; background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%); animation: drift 14s ease-in-out infinite; }
-    .orb2 { width: 400px; height: 400px; bottom: -100px; right: -80px; background: radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%); animation: drift 18s ease-in-out infinite reverse; }
-    @keyframes drift {
-      0%,100% { transform: translate(0,0); }
-      33% { transform: translate(40px,30px); }
-      66% { transform: translate(-20px,50px); }
-    }
+.card{background:#111;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden;}
+.card-path{font-size:12px;color:#444;padding:10px 22px;border-bottom:1px solid #1e1e1e;}
+.card-body{padding:28px 28px 22px;}
 
-    /* ── Navbar ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 0 2rem; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(5,8,15,0.75);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800; font-size: 1.25rem;
-      color: var(--blue-light); text-decoration: none;
-      letter-spacing: -0.02em;
-    }
-    .nav-logo span { color: var(--text-muted); font-weight: 400; }
 
-    .burger {
-      background: none; border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px 10px;
-      cursor: pointer; display: flex; flex-direction: column; gap: 5px;
-      transition: border-color 0.2s;
-    }
-    .burger:hover { border-color: var(--blue); }
-    .burger-line { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
-    .burger.open .burger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .burger.open .burger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .burger.open .burger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.input-line{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.input-prompt{font-size:13px;color:#444;white-space:nowrap;}
+.secret-input{
+  flex:1;background:transparent;border:none;border-bottom:1px solid #2a2a2a;
+  color:#ddd;font-family:'Courier New',monospace;font-size:14px;
+  padding:6px 0;outline:none;transition:border-color 0.2s;
+  caret-color:#fff;
+}
+.secret-input::placeholder{color:#333;}
+.secret-input:focus{border-color:#555;}
 
-    .dropdown {
-      position: absolute; top: calc(100% + 8px); right: 2rem;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 0.75rem;
-      min-width: 200px; display: flex; flex-direction: column; gap: 2px;
-      opacity: 0; transform: translateY(-8px) scale(0.97);
-      pointer-events: none;
-      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(37,99,235,0.1);
-    }
-    .dropdown.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-    .dropdown a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 8px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.9rem; font-weight: 500; transition: all 0.15s;
-    }
-    .dropdown a:hover { background: var(--surface2); color: var(--text); }
-    .dropdown a.active { color: var(--blue-light); }
-    .dropdown-icon { font-size: 1rem; width: 20px; text-align: center; }
-    .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
-    .dropdown-socials { display: flex; gap: 8px; padding: 8px 12px 4px; }
-    .social-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 10px;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.8rem; font-weight: 500;
-      transition: all 0.15s; flex: 1; justify-content: center;
-    }
-    .social-pill:hover { border-color: var(--blue); color: var(--text); }
-    .social-pill img { width: 16px; height: 16px; object-fit: contain; }
 
-    /* ── Main ── */
-    main {
-      position: relative; z-index: 1;
-      max-width: 540px; margin: 0 auto;
-      padding: 100px 1.5rem 4rem;
-      display: flex; flex-direction: column; gap: 16px;
-    }
+.otp-section{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.otp-code{
+  font-family:'Courier New',monospace;font-weight:bold;font-size:3.5rem;
+  letter-spacing:0.2em;color:#ddd;
+  background:#0a0a0a;border:1px solid #222;border-radius:4px;
+  padding:1.2rem 2.5rem;cursor:pointer;transition:all 0.15s;
+  user-select:none;width:100%;text-align:center;
+}
+.otp-code.inactive{color:#2a2a2a;}
+.otp-code.active:hover{border-color:#444;color:#fff;}
+.otp-code.copied{color:#22c55e !important;border-color:#1a3a1a !important;}
 
-    /* ── Page header ── */
-    .page-header {
-      animation: fadeUp 0.5s ease both;
-    }
-    .page-label {
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.7rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--blue-light); margin-bottom: 6px;
-    }
-    .page-title {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800; font-size: 2rem;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #fff 0%, var(--blue-light) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .page-sub { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; }
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 1.75rem;
-      animation: fadeUp 0.5s 0.05s ease both;
-      position: relative; overflow: hidden;
-    }
-    .card::before {
-      content: ''; position: absolute;
-      top: 0; left: 50%; transform: translateX(-50%);
-      width: 160px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--blue), transparent);
-    }
+.timer-row{width:100%;display:flex;flex-direction:column;gap:8px;}
+.timer-meta{display:flex;justify-content:space-between;font-size:11px;color:#333;}
+.timer-bar-bg{width:100%;height:2px;background:#1a1a1a;border-radius:99px;overflow:hidden;}
+.timer-bar{height:100%;border-radius:99px;background:#555;transition:width 1s linear,background 1s;}
+.timer-bar.low{background:#5a1e1e;}
 
-    /* ── Input ── */
-    .input-label {
-      font-size: 0.78rem; font-weight: 600;
-      color: var(--text-muted); letter-spacing: 0.04em;
-      text-transform: uppercase; margin-bottom: 8px;
-      display: block;
-    }
-    .secret-input {
-      width: 100%; padding: 12px 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text); font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .secret-input::placeholder { color: var(--text-muted); }
-    .secret-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-    }
+.copy-hint{font-size:11px;color:#333;text-align:center;}
+.error-msg{font-size:12px;color:#5a1e1e;min-height:1.2em;text-align:center;}
 
-    /* ── OTP display ── */
-    .otp-wrap {
-      margin-top: 1.5rem;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-    }
-    .otp-code {
-      font-family: 'Outfit', monospace;
-      font-weight: 800; font-size: 3rem;
-      letter-spacing: 0.15em;
-      color: var(--text);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1rem 2rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      user-select: none;
-      width: 100%; text-align: center;
-      position: relative;
-    }
-    .otp-code.inactive { color: var(--text-muted); }
-    .otp-code.active { border-color: var(--border-hover); }
-    .otp-code:hover.active {
-      background: var(--surface);
-      box-shadow: 0 0 20px var(--blue-glow);
-      transform: scale(1.01);
-    }
-    .otp-code.copied {
-      color: var(--green) !important;
-      border-color: rgba(34,197,94,0.4) !important;
-    }
 
-    /* timer bar */
-    .timer-wrap { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-    .timer-text {
-      display: flex; justify-content: space-between;
-      font-size: 0.8rem; color: var(--text-muted);
-    }
-    .timer-bar-bg {
-      width: 100%; height: 4px;
-      background: var(--surface2); border-radius: 99px; overflow: hidden;
-    }
-    .timer-bar {
-      height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, var(--blue), var(--blue-light));
-      transition: width 1s linear, background 1s;
-    }
-    .timer-bar.low { background: linear-gradient(90deg, #ef4444, #f97316); }
-
-    /* ── Error ── */
-    .error-msg {
-      font-size: 0.82rem; color: var(--red);
-      min-height: 1.2em; text-align: center; margin-top: 4px;
-    }
-
-    /* ── Note card ── */
-    .note-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px; padding: 1rem 1.25rem;
-      display: flex; gap: 10px; align-items: flex-start;
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
-    .note-icon { font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
-    .note-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
-
-    /* copy hint */
-    .copy-hint {
-      font-size: 0.75rem; color: var(--text-muted);
-      display: flex; align-items: center; gap: 4px;
-      justify-content: center;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+.note{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:14px 22px;display:flex;gap:10px;align-items:flex-start;}
+.note-icon{color:#333;flex-shrink:0;font-size:13px;}
+.note-text{font-size:12px;color:#444;line-height:1.6;}
+</style>
 </head>
 <body>
+<div id="wrap">
+  <nav class="nav">
+    <a href="/">geigi.net</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-cur">2fa</span>
+  </nav>
 
-<div class="bg-grid"></div>
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
+  <pre id="ascii-out"></pre>
 
-<nav>
-  <a href="/" class="nav-logo">Geigi<span>.net</span></a>
-  <div style="position:relative;">
-    <button class="burger" id="burgerBtn" onclick="toggleMenu()" aria-label="Menu">
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-      <div class="burger-line"></div>
-    </button>
-    <div class="dropdown" id="dropdown">
-      <a href="/"><span class="dropdown-icon">🏠</span> Home</a>
-      <a href="projects"><span class="dropdown-icon">🛠️</span> Projects</a>
-      <a href="verify"><span class="dropdown-icon">✅</span> Verify Me</a>
-      <a href="2fa" class="active"><span class="dropdown-icon">🔐</span> 2FA Generator</a>
-      <a href="https://dcserver.dev/" target="_blank"><span class="dropdown-icon">💬</span> Discord Setups</a>
-      <div class="dropdown-divider"></div>
-      <div class="dropdown-socials">
-        <a class="social-pill" href="https://discord.com/users/463953200559685632" target="_blank">
-          <img src="discord.png" alt="Discord"> @geigi
-        </a>
-        <a class="social-pill" href="https://oguser.com/geigi" target="_blank">
-          <img src="Oguserslogo.png" alt="OGU"> /geigi
-        </a>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<main>
-  <div class="page-header">
-    
-    <div class="page-title">2FA Generator</div>
-    <div class="page-sub">Generate TOTP codes instantly — your secret never leaves your browser.</div>
-  </div>
-
-  <div class="card">
-    <label class="input-label" for="secret">Your TOTP Secret</label>
-    <input type="text" id="secret" class="secret-input" placeholder="Paste your secret key here…" autocomplete="off" spellcheck="false">
-
-    <div class="otp-wrap">
-      <div class="otp-code inactive" id="otp" title="Click to copy">000 000</div>
-      <div class="copy-hint" id="copyHint">Click code to copy</div>
-      <div class="timer-wrap">
-        <div class="timer-text">
-          <span id="timerLabel">Waiting for secret…</span>
-          <span id="timerCount">30s</span>
+  <div class="content">
+    <div class="card">
+      <div class="card-path">/home/geigi/2fa/generator</div>
+      <div class="card-body">
+        <div class="input-line">
+          <span class="input-prompt">secret&nbsp;&gt;</span>
+          <input type="text" id="secret" class="secret-input" placeholder="paste your TOTP secret key…" autocomplete="off" spellcheck="false">
         </div>
-        <div class="timer-bar-bg">
-          <div class="timer-bar" id="timerBar" style="width:100%"></div>
+        <div class="otp-section">
+          <div class="otp-code inactive" id="otp">000 000</div>
+          <div class="copy-hint" id="copyHint">// click to copy</div>
+          <div class="timer-row">
+            <div class="timer-meta">
+              <span id="timerLabel">waiting for secret…</span>
+              <span id="timerCount">30s</span>
+            </div>
+            <div class="timer-bar-bg"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+          </div>
+          <div class="error-msg" id="error"></div>
         </div>
       </div>
     </div>
-    <div class="error-msg" id="error"></div>
-  </div>
 
-  <div class="note-card">
-    <span class="note-icon">🔒</span>
-    <span class="note-text">Your secret key is processed entirely in your browser and is never sent to any server. Codes refresh automatically every 30 seconds.</span>
+    <div class="note">
+      <span class="note-icon">[i]</span>
+      <span class="note-text">Your secret key is processed entirely in your browser and never sent to any server. Codes refresh automatically every 30 seconds.</span>
+    </div>
   </div>
-</main>
+</div>
 
 <script>
-  // ── Menu ──
-  function toggleMenu() {
-    document.getElementById('burgerBtn').classList.toggle('open');
-    document.getElementById('dropdown').classList.toggle('show');
-  }
-  document.addEventListener('click', e => {
-    const btn = document.getElementById('burgerBtn');
-    const dd  = document.getElementById('dropdown');
-    if (!btn.contains(e.target) && !dd.contains(e.target)) {
-      btn.classList.remove('open');
-      dd.classList.remove('show');
+
+const CHARS=' ..,,::--==++xxXX8800SS##@@';
+function renderAscii(){
+  const COLS=110,ROWS=22,CW=1600,CH=260;
+  const cv=document.createElement('canvas');
+  cv.width=CW;cv.height=CH;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#000';ctx.fillRect(0,0,CW,CH);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 180px Arial Black,Impact,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('2FA Generator',CW/2,CH/2);
+  const cellW=CW/COLS,cellH=CH/ROWS;
+  let out='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const x=Math.floor(c*cellW),y=Math.floor(r*cellH);
+      const pw=Math.max(1,Math.floor(cellW)),ph=Math.max(1,Math.floor(cellH));
+      const px=ctx.getImageData(x,y,pw,ph).data;
+      let sum=0;for(let i=0;i<px.length;i+=4)sum+=px[i];
+      const avg=sum/(px.length/4);
+      out+=CHARS[Math.floor((avg/255)*(CHARS.length-1))];
     }
-  });
-
-  // ── 2FA logic ──
-  let secretKey = "";
-  let currentOtp = null;
-
-  function leftpad(str, len, pad) {
-    while (str.length < len) str = pad + str;
-    return str;
+    out+='\n';
   }
-  function dec2hex(s) { return (s < 15.5 ? '0' : '') + Math.round(s).toString(16); }
-  function hex2dec(s) { return parseInt(s, 16); }
+  document.getElementById('ascii-out').textContent=out;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',renderAscii);
+else renderAscii();
 
-  function base32tohex(base32) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    let bits = "", hex = "";
-    for (let i = 0; i < base32.length; i++) {
-      const val = chars.indexOf(base32.charAt(i).toUpperCase());
-      if (val < 0) throw new Error("Invalid base32");
-      bits += leftpad(val.toString(2), 5, '0');
+
+let secretKey='',currentOtp=null;
+function leftpad(s,l,p){while(s.length<l)s=p+s;return s;}
+function dec2hex(s){return(s<15.5?'0':'')+Math.round(s).toString(16);}
+function hex2dec(s){return parseInt(s,16);}
+function base32tohex(b){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits='',hex='';
+  for(let i=0;i<b.length;i++){const v=chars.indexOf(b[i].toUpperCase());if(v<0)throw new Error('bad');bits+=leftpad(v.toString(2),5,'0');}
+  for(let i=0;i+4<=bits.length;i+=4)hex+=parseInt(bits.substr(i,4),2).toString(16);
+  return hex;
+}
+function formatOtp(o){return o.slice(0,3)+' '+o.slice(3);}
+function generateOtp(key){
+  const epoch=Math.round(Date.now()/1000);
+  const time=leftpad(dec2hex(Math.floor(epoch/30)),16,'0');
+  const sha=new jsSHA('SHA-1','HEX');
+  sha.setHMACKey(key,'HEX');sha.update(time);
+  const hmac=sha.getHMAC('HEX');
+  const offset=hex2dec(hmac.substring(hmac.length-1));
+  let otp=(hex2dec(hmac.substr(offset*2,8))&hex2dec('7fffffff'))+'';
+  return leftpad(otp.substring(otp.length-6),6,'0');
+}
+function updateOtp(){
+  const el=document.getElementById('otp'),err=document.getElementById('error');
+  if(secretKey.length>=16){
+    try{
+      const key=base32tohex(secretKey),otp=generateOtp(key);
+      currentOtp=otp;el.textContent=formatOtp(otp);
+      el.classList.remove('inactive');el.classList.add('active');err.textContent='';
+    }catch{
+      currentOtp=null;el.textContent='000 000';
+      el.classList.add('inactive');el.classList.remove('active');
+      err.textContent='// invalid secret key';
     }
-    for (let i = 0; i + 4 <= bits.length; i += 4)
-      hex += parseInt(bits.substr(i, 4), 2).toString(16);
-    return hex;
+  }else{
+    currentOtp=null;el.textContent='000 000';
+    el.classList.add('inactive');el.classList.remove('active');err.textContent='';
   }
-
-  function formatOtp(otp) {
-    return otp.slice(0, 3) + ' ' + otp.slice(3);
+}
+function updateTimer(){
+  const epoch=Math.round(Date.now()/1000);
+  const remaining=30-(epoch%30);
+  document.getElementById('timerCount').textContent=remaining+'s';
+  const bar=document.getElementById('timerBar');
+  bar.style.width=((remaining/30)*100)+'%';
+  bar.classList.toggle('low',remaining<=7);
+  if(currentOtp){
+    document.getElementById('timerLabel').textContent='// refreshes in';
+    if(epoch%30===0)updateOtp();
+  }else{
+    document.getElementById('timerLabel').textContent='// waiting for secret…';
   }
-
-  function generateOtp(key) {
-    const epoch = Math.round(Date.now() / 1000);
-    const time  = leftpad(dec2hex(Math.floor(epoch / 30)), 16, '0');
-    const shaObj = new jsSHA("SHA-1", "HEX");
-    shaObj.setHMACKey(key, "HEX");
-    shaObj.update(time);
-    const hmac   = shaObj.getHMAC("HEX");
-    const offset = hex2dec(hmac.substring(hmac.length - 1));
-    let otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec('7fffffff')) + '';
-    return leftpad(otp.substring(otp.length - 6), 6, '0');
-  }
-
-  function updateOtp() {
-    const el = document.getElementById('otp');
-    const err = document.getElementById('error');
-    if (secretKey.length >= 16) {
-      try {
-        const key = base32tohex(secretKey);
-        const otp = generateOtp(key);
-        currentOtp = otp;
-        el.textContent = formatOtp(otp);
-        el.classList.remove('inactive');
-        el.classList.add('active');
-        err.textContent = "";
-      } catch {
-        currentOtp = null;
-        el.textContent = "000 000";
-        el.classList.add('inactive'); el.classList.remove('active');
-        err.textContent = "Invalid secret key.";
-      }
-    } else {
-      currentOtp = null;
-      el.textContent = "000 000";
-      el.classList.add('inactive'); el.classList.remove('active');
-      err.textContent = "";
-    }
-  }
-
-  function updateTimer() {
-    const epoch     = Math.round(Date.now() / 1000);
-    const remaining = 30 - (epoch % 30);
-    const pct       = (remaining / 30) * 100;
-
-    document.getElementById('timerCount').textContent = remaining + 's';
-    const bar = document.getElementById('timerBar');
-    bar.style.width = pct + '%';
-    bar.classList.toggle('low', remaining <= 7);
-
-    if (currentOtp) {
-      document.getElementById('timerLabel').textContent = 'Refreshes in';
-      if (epoch % 30 === 0) updateOtp();
-    } else {
-      document.getElementById('timerLabel').textContent = 'Waiting for secret…';
-    }
-  }
-
-  document.getElementById('secret').addEventListener('input', function () {
-    secretKey = this.value.replace(/\s/g, '');
-    updateOtp();
-  });
-
-  document.getElementById('otp').addEventListener('click', () => {
-    if (!currentOtp) return;
-    const el = document.getElementById('otp');
-    const hint = document.getElementById('copyHint');
-
-    const text = currentOtp;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-
-    el.classList.add('copied');
-    el.textContent = 'Copied!';
-    hint.textContent = '✅ Copied to clipboard';
-    setTimeout(() => {
-      el.classList.remove('copied');
-      el.textContent = formatOtp(currentOtp);
-      hint.textContent = '🖱️ Click code to copy';
-    }, 1200);
-  });
-
-  setInterval(updateTimer, 1000);
-  updateTimer();
+}
+document.getElementById('secret').addEventListener('input',function(){
+  secretKey=this.value.replace(/\s/g,'');updateOtp();
+});
+document.getElementById('otp').addEventListener('click',()=>{
+  if(!currentOtp)return;
+  const el=document.getElementById('otp'),hint=document.getElementById('copyHint');
+  if(navigator.clipboard)navigator.clipboard.writeText(currentOtp);
+  else{const ta=document.createElement('textarea');ta.value=currentOtp;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  el.classList.add('copied');el.textContent='copied!';hint.textContent='// copied to clipboard';
+  setTimeout(()=>{el.classList.remove('copied');el.textContent=formatOtp(currentOtp);hint.textContent='// click to copy';},1200);
+});
+setInterval(updateTimer,1000);updateTimer();
 </script>
 </body>
 </html>
