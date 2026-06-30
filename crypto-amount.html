@@ -59,7 +59,7 @@
       }
 
       try {
-        // CoinGecko API (no key required)
+       
         const url = `https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd`;
         const res = await fetch(url);
         const data = await res.json();
